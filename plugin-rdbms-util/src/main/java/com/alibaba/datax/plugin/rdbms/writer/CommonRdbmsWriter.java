@@ -17,10 +17,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -345,7 +342,13 @@ public class CommonRdbmsWriter {
                 throws SQLException {
             PreparedStatement preparedStatement = null;
             try {
-                connection.setAutoCommit(false);
+                //connection.setAutoCommit(false);
+                try {
+                    // make sure autocommit is off
+                    connection.setAutoCommit(false);
+                } catch (SQLFeatureNotSupportedException ignore) {
+                    LOG.warn("current database does not support AUTO_COMMIT property");
+                }
                 preparedStatement = connection
                         .prepareStatement(this.writeRecordSql);
 
@@ -371,7 +374,13 @@ public class CommonRdbmsWriter {
         protected void doOneInsert(Connection connection, List<Record> buffer) {
             PreparedStatement preparedStatement = null;
             try {
-                connection.setAutoCommit(true);
+                //connection.setAutoCommit(true);
+                try {
+                    // make sure autocommit is off
+                    connection.setAutoCommit(false);
+                } catch (SQLFeatureNotSupportedException ignore) {
+                    LOG.warn("current database does not support AUTO_COMMIT property");
+                }
                 preparedStatement = connection
                         .prepareStatement(this.writeRecordSql);
 
